@@ -75,45 +75,14 @@ export default function LoginForm() {
     setError('');
     
     try {
-      // Use redirect: false to handle the redirect ourselves
-      const result = await signIn('google', { 
-        redirect: false 
+      // 不再使用复杂的错误处理流程，直接调用
+      await signIn('google', { 
+        callbackUrl: window.location.origin 
       });
-      
-      if (result?.error) {
-        setError('Google sign-in failed');
-        setIsLoading(false);
-        return;
-      }
-      
-      // Check if user exists in database after successful Google login
-      try {
-        const sessionResponse = await fetch('/api/auth/session');
-        
-        if (sessionResponse.status === 401) {
-          setError('Google account not registered in our system');
-          setIsLoading(false);
-          return;
-        }
-        
-        if (!sessionResponse.ok) {
-          console.error('Error checking session:', sessionResponse.statusText);
-          setError('An error occurred during login verification');
-          setIsLoading(false);
-          return;
-        }
-        
-        // Redirect to dashboard on successful login and database verification
-        router.push('/');
-        router.refresh();
-      } catch (sessionError) {
-        console.error('Session check error:', sessionError);
-        setError('An error occurred while verifying your account');
-        setIsLoading(false);
-      }
+      // 重定向将由 NextAuth 自动处理
     } catch (error) {
-      console.error('Google sign-in error:', error);
-      setError('An unexpected error occurred');
+      console.error('Google 登录错误:', error);
+      setError('登录过程中发生错误');
       setIsLoading(false);
     }
   };
