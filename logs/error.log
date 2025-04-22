@@ -1,0 +1,24 @@
+2025-04-22 04:51:20: MongoServerSelectionError: connect ECONNREFUSED ::1:7117, connect ECONNREFUSED 127.0.0.1:7117
+2025-04-22 04:51:20:     at <unknown> (MongoServerSelectionError: connect ECONNREFUSED ::1:7117, connect ECONNREFUSED 127.0.0.1:7117) {
+2025-04-22 04:51:20:   errorLabelSet: Set(0) {},
+2025-04-22 04:51:20:   reason: [TopologyDescription],
+2025-04-22 04:51:20:   code: undefined,
+2025-04-22 04:51:20:   [cause]: MongoNetworkError: connect ECONNREFUSED ::1:7117, connect ECONNREFUSED 127.0.0.1:7117
+2025-04-22 04:51:20:       at <unknown> (MongoNetworkError: connect ECONNREFUSED ::1:7117, connect ECONNREFUSED 127.0.0.1:7117) {
+2025-04-22 04:51:20:     errorLabelSet: Set(1) { 'ResetPool' },
+2025-04-22 04:51:20:     beforeHandshake: false,
+2025-04-22 04:51:20:     [cause]: [AggregateError: ] { code: 'ECONNREFUSED' }
+2025-04-22 04:51:20:   }
+2025-04-22 04:51:20: }
+2025-04-22 04:51:20:  ⨯ unhandledRejection:  MongoServerSelectionError: connect ECONNREFUSED ::1:7117, connect ECONNREFUSED 127.0.0.1:7117
+2025-04-22 04:51:20:     at <unknown> (MongoServerSelectionError: connect ECONNREFUSED ::1:7117, connect ECONNREFUSED 127.0.0.1:7117) {
+2025-04-22 04:51:20:   errorLabelSet: Set(0) {},
+2025-04-22 04:51:20:   reason: [TopologyDescription],
+2025-04-22 04:51:20:   code: undefined,
+2025-04-22 04:51:20:   [cause]: MongoNetworkError: connect ECONNREFUSED ::1:7117, connect ECONNREFUSED 127.0.0.1:7117
+2025-04-22 04:51:20:       at <unknown> (MongoNetworkError: connect ECONNREFUSED ::1:7117, connect ECONNREFUSED 127.0.0.1:7117) {
+2025-04-22 04:51:20:     errorLabelSet: Set(1) { 'ResetPool' },
+2025-04-22 04:51:20:     beforeHandshake: false,
+2025-04-22 04:51:20:     [cause]: [AggregateError: ] { code: 'ECONNREFUSED' }
+2025-04-22 04:51:20:   }
+2025-04-22 04:51:20: }

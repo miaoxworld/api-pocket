@@ -1,0 +1,86 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [ main ]  # 当推送到 main 分支时触发
+  workflow_dispatch:    # 允许手动触发部署
+
+  
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: unnecessary
+
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Debug SSH
+        run: |
+          echo "Debugging SSH connection..."
+          echo "SSH_USER: ${{ secrets.SSH_USER }}"
+          echo "VPS_HOST: ${{ secrets.VPS_HOST }}"
+          ssh -v ${{ secrets.SSH_USER }}@${{ secrets.VPS_HOST }} "echo Success"
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci  # 使用 npm ci 以确保安装 package-lock.json 中的版本
+        
+      - name: Build the project
+        run: npm run build  # 添加构建步骤
+        
+
+        
+      - name: Deploy with rsync
+        run: |
+          rsync -avz \
+            ./ \
+            ${{ secrets.SSH_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.DEPLOY_PATH }}
+            
+      - name: Execute remote commands
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+            export PATH="$PATH:/usr/local/bin:/usr/bin"
+            source ~/.bashrc
+            cd ${{ secrets.DEPLOY_PATH }}
+            
+            # 从 GitHub secret 创建 ecosystem 配置文件
+            cat > ecosystem-xxworld.config.cjs << 'EOL'
+            ${{ secrets.ECOSYSTEM_CONFIG }}
+            EOL
+            
+            
+            # 检查 pm2 进程是否存在
+            echo "Process exists, restarting..."
+            pm2 stop ecosystem-xxworld.config.cjs
+            pm2 delete ecosystem-xxworld.config.cjs
+            pm2 restart ecosystem-xxworld.config.cjs --env production
+
+      - name: Send Telegram Message
+        uses: cbrgm/telegram-github-action@v1
+        with:
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          message: |
+            "api pocket 成功!"
+            Commit: ${{ github.event.head_commit.message }}
