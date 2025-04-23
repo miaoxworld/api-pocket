@@ -31,18 +31,18 @@ export async function POST(request: NextRequest) {
     const requestBody = await requestClone.json();
     
     // Find an API that supports the requested model, or use the first active API if no model specified
-    //randome target api
-    const randomIndex = Math.floor(Math.random() * validation.endpoints.length);
-    let targetApi = validation.endpoints[randomIndex];
+    let targetApi;
     
     if (requestBody.model) {
-      // Find API that supports the requested model
-      const supportingApi = validation.endpoints.find(api => 
+      // Filter APIs that support the requested model
+      const supportingApis = validation.endpoints.filter(api => 
         api.models.includes(requestBody.model) && api.isActive
       );
       
-      if (supportingApi) {
-        targetApi = supportingApi;
+      if (supportingApis.length > 0) {
+        // Randomly select one of the supporting APIs
+        const randomIndex = Math.floor(Math.random() * supportingApis.length);
+        targetApi = supportingApis[randomIndex];
       } else {
         // If no API specifically supports this model, return an error with available models
         const availableModels = validation.endpoints.flatMap(api => api.models);
@@ -55,9 +55,20 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
+    } else {
+      // If no model specified, randomly select from all active endpoints
+      const activeEndpoints = validation.endpoints.filter(api => api.isActive);
+      if (activeEndpoints.length === 0) {
+        return NextResponse.json(
+          { error: { message: 'No active API endpoints available.' } },
+          { status: 503 }
+        );
+      }
+      const randomIndex = Math.floor(Math.random() * activeEndpoints.length);
+      targetApi = activeEndpoints[randomIndex];
     }
     
-    // Check if API is active
+    // Check if API is active (redundant check for the no model case)
     if (!targetApi.isActive) {
       return NextResponse.json(
         { error: { message: 'The API endpoint is currently inactive.' } },
