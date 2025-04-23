@@ -118,7 +118,11 @@
     "key": "キー",
     "value": "値",
     "required": "必須",
-    "optional": "任意"
+    "optional": "任意",
+    "connectionSuccess": "接続に成功しました",
+    "connectionFailed": "接続に失敗しました",
+    "enterNewApiKey": "新しいAPIキーを入力（任意）",
+    "leaveBlankToKeepCurrent": "現在のAPIキーを保持する場合は空白のままにしてください"
   },
   "clientTest": {
     "title": "クライアントコンポーネントテスト"

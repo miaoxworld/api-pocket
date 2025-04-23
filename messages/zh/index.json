@@ -123,7 +123,9 @@
     "key": "键",
     "value": "值",
     "required": "必填",
-    "optional": "可选"
+    "optional": "可选",
+    "enterNewApiKey": "输入新的API密钥（可选）",
+    "leaveBlankToKeepCurrent": "留空以保留当前API密钥"
   },
   "clientTest": {
     "title": "客户端组件测试"

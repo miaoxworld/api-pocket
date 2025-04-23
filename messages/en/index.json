@@ -110,7 +110,9 @@
     "retries": "Max Retries",
     "testConnection": "Test Connection",
     "connectionSuccess": "Connection successful",
-    "connectionFailed": "Connection failed"
+    "connectionFailed": "Connection failed",
+    "enterNewApiKey": "Enter new API key (optional)",
+    "leaveBlankToKeepCurrent": "Leave blank to keep the current API key"
   },
   "clientTest": {
     "title": "Client Component Test"

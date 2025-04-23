@@ -51,6 +51,13 @@ function EndpointManagerContent() {
   const t = useTranslations('endpoints');
   const common = useTranslations('app.common');
 
+  // Helper function to mask API key
+  const maskApiKey = (apiKey: string) => {
+    if (!apiKey) return '';
+    if (apiKey.length <= 8) return '••••••••';
+    return `${apiKey.substring(0, 4)}••••••${apiKey.substring(apiKey.length - 4)}`;
+  };
+
   // Fetch endpoints
   useEffect(() => {
     if (session) {
@@ -324,6 +331,9 @@ function EndpointManagerContent() {
                         {t('baseUrl')}
                       </th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        {t('apiKey')}
+                      </th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         {t('status')}
                       </th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -349,6 +359,11 @@ function EndpointManagerContent() {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm text-gray-500 dark:text-gray-400">{endpoint.baseUrl}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                              {maskApiKey(endpoint.apiKey)}
+                            </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -560,6 +575,23 @@ function EndpointManagerContent() {
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 dark:border-gray-600 leading-tight focus:outline-none focus:shadow-outline"
                   required
                 />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" htmlFor="edit-apiKey">
+                  {t('apiKey')}
+                </label>
+                <input
+                  type="password"
+                  id="edit-apiKey"
+                  name="apiKey"
+                  value={formData.apiKey}
+                  onChange={handleInputChange}
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 dark:border-gray-600 leading-tight focus:outline-none focus:shadow-outline"
+                  placeholder={t('enterNewApiKey')}
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  {t('leaveBlankToKeepCurrent')}
+                </p>
               </div>
               <div className="mb-4">
                 <label className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" htmlFor="edit-models">
