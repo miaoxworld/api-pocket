@@ -48,7 +48,7 @@ export default function Navigation() {
               <LanguageSwitcher />
             </div>
             <Link 
-              href="https://github.com/miaoxworld/api-pocket-nextjs" 
+              href="https://github.com/miaoxworld/api-pocket" 
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-500 transition-colors"

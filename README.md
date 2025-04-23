@@ -2,6 +2,8 @@
 
 A web application for managing and proxying OpenAI-compatible API endpoints.
 
+**Demo**:[API Pocket](https://api-pocket.xxworld.org/)
+
 ## Features
 
 - **Endpoint Management**: Add, edit, delete, and toggle OpenAI-compatible API endpoints
