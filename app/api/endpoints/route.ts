@@ -40,6 +40,7 @@ export async function GET() {
       id: endpoint._id.toString(),
       name: endpoint.name,
       baseUrl: endpoint.baseUrl,
+      apiKey: endpoint.apiKey,
       isActive: endpoint.isActive,
       models: endpoint.models || [],
       userId: endpoint.userId.toString(),
@@ -115,6 +116,7 @@ export async function POST(request: NextRequest) {
       _id: new ObjectId(),
       name,
       baseUrl: baseUrl.trim().replace(/\/$/, ''), // Remove trailing slash
+      apiKey: apiKey,
       isActive: true,
       models: modelsList,
       userId: user._id,
@@ -142,6 +144,7 @@ export async function POST(request: NextRequest) {
         id: newEndpoint._id.toString(),
         name: newEndpoint.name,
         baseUrl: newEndpoint.baseUrl,
+        apiKey: newEndpoint.apiKey,
         isActive: newEndpoint.isActive,
         models: newEndpoint.models,
         userId: newEndpoint.userId.toString(),

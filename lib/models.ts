@@ -16,6 +16,7 @@ export interface EndpointConfig {
   _id: ObjectId;
   name: string;
   baseUrl: string;
+  apiKey: string;
   isActive: boolean;
   models: string[];
   userId: ObjectId;

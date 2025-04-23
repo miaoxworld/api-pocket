@@ -76,6 +76,7 @@ export async function PATCH(
         id: updated._id.toString(),
         name: updated.name,
         baseUrl: updated.baseUrl,
+        apiKey: updated.apiKey,
         isActive: updated.isActive,
         models: updated.models || [],
         createdAt: updated.createdAt,

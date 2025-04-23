@@ -12,6 +12,7 @@ interface Endpoint {
   id: string;
   name: string;
   baseUrl: string;
+  apiKey: string;
   isActive: boolean;
   models: string[];
   userId?: string;
@@ -179,7 +180,8 @@ function EndpointManagerContent() {
       const endpointData = {
         name: formData.name,
         baseUrl: formData.baseUrl,
-        models: selectedModels
+        models: selectedModels,
+        apiKey: formData.apiKey
       };
       
       const response = await fetch(`/api/endpoints/${currentEndpoint.id}`, {

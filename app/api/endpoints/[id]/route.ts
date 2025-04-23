@@ -64,6 +64,7 @@ export async function GET(
         id: endpoint._id.toString(),
         name: endpoint.name,
         baseUrl: endpoint.baseUrl,
+        apiKey: endpoint.apiKey,
         isActive: endpoint.isActive,
         models: endpoint.models || [],
         userId: endpoint.userId.toString(),
@@ -107,12 +108,12 @@ export async function PUT(
     
     // Parse request body
     const body = await request.json();
-    const { name, baseUrl, models } = body;
+    const { name, baseUrl, models, apiKey } = body;
     
     // Validate required fields
-    if (!name || !baseUrl) {
+    if (!name || !baseUrl || !apiKey) {
       return NextResponse.json(
-        { success: false, message: 'Name and Base URL are required' },
+        { success: false, message: 'Name, Base URL and API Key are required' },
         { status: 400 }
       );
     }
@@ -167,6 +168,7 @@ export async function PUT(
         $set: { 
           name, 
           baseUrl: baseUrlFormatted, 
+          apiKey: apiKey,
           models: modelsList,
           updatedAt: new Date() 
         } 
@@ -200,6 +202,7 @@ export async function PUT(
         id: updated._id.toString(),
         name: updated.name,
         baseUrl: updated.baseUrl,
+        apiKey: updated.apiKey,
         isActive: updated.isActive,
         models: updated.models || [],
         userId: updated.userId.toString(),
