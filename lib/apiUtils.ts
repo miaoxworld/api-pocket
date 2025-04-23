@@ -5,6 +5,7 @@ export interface ApiConfig {
   id: string;
   name: string;
   baseUrl: string;
+  apiKey: string;
   isActive: boolean;
   models: string[];
   userId: string;
@@ -58,6 +59,7 @@ export async function validateApiKey(apiKey: string): Promise<{ valid: boolean; 
       id: apiDoc._id.toString(),
       name: apiDoc.name,
       baseUrl: apiDoc.baseUrl,
+      apiKey: apiDoc.apiKey,
       isActive: apiDoc.isActive,
       models: apiDoc.models || [],
       userId: apiDoc.userId.toString(),
@@ -102,6 +104,8 @@ export async function forwardRequest(
     
     // Set up the headers for the forwarded request
     const headers = new Headers();
+    // use apikey by ApiConfig，not original request
+    headers.append('Authorization', `Bearer ${api.apiKey}`);
     request.headers.forEach((value, key) => {
       // Don't forward some headers like host
       if (!['host', 'connection'].includes(key.toLowerCase())) {
