@@ -1,17 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { validateApiKey, forwardRequest, updateApiKeyUsage } from '@/lib/apiUtils';
 import { recordApiUsage, calculateTokens, extractUsageFromResponse } from '@/lib/usageTracker';
 
-// This route handles all OpenAI-compatible API requests
+// This route handles OpenAI-compatible completions API requests
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
   try {
     // Get API key from Authorization header
     const authHeader = request.headers.get('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { error: { message: 'Authentication failed. Please provide a valid API key.' } },
-        { status: 401 }
+      return new Response(
+        JSON.stringify({ error: { message: 'Authentication failed. Please provide a valid API key.' } }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
       );
     }
     
@@ -22,15 +22,14 @@ export async function POST(request: NextRequest) {
     const validation = await validateApiKey(apiKey);
     
     if (!validation.valid || !validation.endpoints || !validation.key) {
-      return NextResponse.json(
-        { error: { message: 'Invalid API key or associated API configuration not found.' } },
-        { status: 401 }
+      return new Response(
+        JSON.stringify({ error: { message: 'Invalid API key or associated API configuration not found.' } }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
       );
     }
     
-    // Get the path from the URL (remove /v1 prefix)
-    const url = new URL(request.url);
-    const path = url.pathname.replace(/^\/v1/, '');
+    // The path for completions
+    const path = '/completions';
     
     // Clone the request to parse body
     const clonedRequest = request.clone();
@@ -38,34 +37,37 @@ export async function POST(request: NextRequest) {
     try {
       requestBody = await clonedRequest.json();
     } catch (error) {
-      requestBody = {};
+      return new Response(
+        JSON.stringify({ error: { message: 'Invalid request body. JSON parsing failed.' } }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
     }
     
     // Check if the request includes a specific model
     const modelName = requestBody.model;
     
-    // Find an API that supports the requested model, or use the first active API if no model specified
-    let targetApi = validation.endpoints[0]; // Default to first API
-    
-    if (modelName) {
-      // Find API that supports the requested model
-      const supportingApi = validation.endpoints.find(api => 
-        api.models.includes(modelName)
+    if (!modelName) {
+      return new Response(
+        JSON.stringify({ error: { message: 'Model parameter is required.' } }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
-      
-      if (supportingApi) {
-        targetApi = supportingApi;
-      } else {
-        // If no API specifically supports this model, return an error
-        return NextResponse.json(
-          { error: { message: `The requested model '${modelName}' is not supported by any configured API.` } },
-          { status: 400 }
-        );
-      }
+    }
+    
+    // Find an API that supports the requested model
+    const supportingApi = validation.endpoints.find(api => 
+      api.models.includes(modelName)
+    );
+    
+    if (!supportingApi) {
+      // If no API supports this model, return an error
+      return new Response(
+        JSON.stringify({ error: { message: `The requested model '${modelName}' is not supported by any configured API.` } }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
     }
     
     // Forward the request to the target API
-    const response = await forwardRequest(request, targetApi, path);
+    const response = await forwardRequest(request, supportingApi, path);
     const endTime = Date.now();
     const latency = endTime - startTime;
     
@@ -123,40 +125,10 @@ export async function POST(request: NextRequest) {
     
     return response;
   } catch (error) {
-    console.error('API proxy error:', error);
-    return NextResponse.json(
-      { error: { message: 'An internal server error occurred.' } },
-      { status: 500 }
+    console.error('Completions API error:', error);
+    return new Response(
+      JSON.stringify({ error: { message: 'An internal server error occurred.' } }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }
-}
-
-// Support for other HTTP methods
-export async function GET(request: NextRequest) {
-  return handleRequest(request);
-}
-
-export async function PUT(request: NextRequest) {
-  return handleRequest(request);
-}
-
-export async function PATCH(request: NextRequest) {
-  return handleRequest(request);
-}
-
-export async function DELETE(request: NextRequest) {
-  return handleRequest(request);
-}
-
-// Generic handler for all methods
-async function handleRequest(request: NextRequest) {
-  // For OpenAI compatibility, most endpoints use POST, but we'll support other methods too
-  if (request.method === 'GET') {
-    // Models endpoint is commonly called with GET
-    if (request.url.includes('/models')) {
-      return POST(request);
-    }
-  }
-  
-  return POST(request);
 } 

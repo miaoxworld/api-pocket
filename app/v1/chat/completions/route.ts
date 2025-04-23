@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     
     // Get the start time for performance measurement
     const startTime = Date.now();
-    
+    console.log('targetApi',targetApi);
     // Forward the request to the target API
     // Path should be "/v1/chat/completions" for OpenAI compatibility
     const response = await forwardRequest(request, targetApi, '/v1/chat/completions');
