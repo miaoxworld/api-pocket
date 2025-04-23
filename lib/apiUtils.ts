@@ -104,15 +104,15 @@ export async function forwardRequest(
     
     // Set up the headers for the forwarded request
     const headers = new Headers();
-    // use apikey by ApiConfig，not original request
-    headers.append('Authorization', `Bearer ${api.apiKey}`);
     request.headers.forEach((value, key) => {
       // Don't forward some headers like host
-      if (!['host', 'connection'].includes(key.toLowerCase())) {
+      if (!['host', 'connection', 'authorization'].includes(key.toLowerCase())) {
         headers.append(key, value);
       }
     });
-    
+    // use apikey by ApiConfig，not original request
+    headers.append('authorization', `Bearer ${api.apiKey}`);
+
     // Make the request to the backend API
     const response = await fetch(targetUrl, {
       method: request.method,
