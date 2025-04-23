@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import Link from "next/link";
 import { useTranslations } from 'next-intl';
+import { useParams } from 'next/navigation';
 import AuthGuard from "../components/AuthGuard";
 import Navigation from "../components/Navigation";
 
@@ -28,12 +29,13 @@ interface DashboardStats {
   users: number;
 }
 
-export default function Home({ params }: { params: { locale: string } }) {
+export default function Home() {
   const { data: session } = useSession();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const locale = params.locale;
+  const params = useParams();
+  const locale = params.locale as string;
   
   // Get translations
   const t = useTranslations('dashboard');
