@@ -4,11 +4,12 @@ import { validateApiKey, updateApiKeyUsage } from '@/lib/apiUtils';
 // Handles GET /v1/models/:model endpoint
 export async function GET(
   request: NextRequest,
-  { params }: { params: { model: string } }
+  { params }: { params: Promise<{ model: string }> }
 ) {
   const startTime = Date.now();
   try {
-    const modelId = params.model;
+    const { model } = await params;
+
     
     // Get API key from Authorization header
     const authHeader = request.headers.get('Authorization');
@@ -34,19 +35,19 @@ export async function GET(
 
     // Find an endpoint that supports the requested model
     const supportingEndpoint = validation.endpoints.find(endpoint => 
-      endpoint.models.includes(modelId)
+      endpoint.models.includes(model)
     );
 
     if (!supportingEndpoint) {
       return NextResponse.json(
-        { error: { message: `The model '${modelId}' does not exist` } },
+        { error: { message: `The model '${model}' does not exist` } },
         { status: 404 }
       );
     }
 
     // Form the OpenAI compatible response
     const modelObject = {
-      id: modelId,
+      id: model,
       object: "model",
       created: Math.floor(Date.now() / 1000),
       owned_by: supportingEndpoint.name,
