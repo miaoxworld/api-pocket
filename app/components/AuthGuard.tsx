@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { ReactNode, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface AuthGuardProps {
   children: ReactNode;
@@ -14,6 +15,7 @@ export default function AuthGuard({ children, requiredRole }: AuthGuardProps) {
   const router = useRouter();
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const t = useTranslations('app.common');
   
   useEffect(() => {
     // Check session status
@@ -85,7 +87,7 @@ export default function AuthGuard({ children, requiredRole }: AuthGuardProps) {
       <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="mt-4 text-lg font-medium text-gray-700 dark:text-gray-300">Loading...</p>
+          <p className="mt-4 text-lg font-medium text-gray-700 dark:text-gray-300">{t('loading')}</p>
         </div>
       </div>
     );

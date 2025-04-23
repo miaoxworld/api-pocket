@@ -59,9 +59,6 @@ export async function GET(
       );
     }
     
-    // Get API name
-    const api = await apisCollection.findOne({ _id: key.apiId });
-    
     // Return the key
     return NextResponse.json({
       success: true,
@@ -69,8 +66,6 @@ export async function GET(
         id: key._id.toString(),
         name: key.name,
         key: key.key,
-        apiId: key.apiId.toString(),
-        apiName: api ? api.name : 'Unknown API',
         isActive: key.isActive,
         createdAt: key.createdAt,
         updatedAt: key.updatedAt,

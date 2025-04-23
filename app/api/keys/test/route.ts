@@ -17,6 +17,7 @@ export async function POST(request: NextRequest) {
     // Get API key from Authorization header
     const authHeader = request.headers.get('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.error('API key not provided');
       return NextResponse.json(
         { success: false, message: 'API key not provided' },
         { status: 400 }
@@ -40,6 +41,7 @@ export async function POST(request: NextRequest) {
     const targetApi = validation.endpoints[0];
     
     if (!targetApi) {
+      console.error('No API configurations available');
       return NextResponse.json(
         { success: false, message: 'No API configurations available' },
         { status: 400 }

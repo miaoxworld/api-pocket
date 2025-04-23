@@ -18,15 +18,8 @@ export async function POST(request: NextRequest) {
     
     // Parse request body
     const body = await request.json();
-    const { apiId, quantity } = body;
+    const {  quantity } = body;
     
-    // Validate required fields
-    if (!apiId) {
-      return NextResponse.json(
-        { success: false, message: 'API ID is required' },
-        { status: 400 }
-      );
-    }
     
     // Validate quantity
     const keyQuantity = parseInt(quantity);
@@ -37,13 +30,6 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Validate ObjectId format
-    if (!ObjectId.isValid(apiId)) {
-      return NextResponse.json(
-        { success: false, message: 'Invalid API ID format' },
-        { status: 400 }
-      );
-    }
     
     // Connect to database
     const client = await clientPromise;
@@ -52,14 +38,7 @@ export async function POST(request: NextRequest) {
     const apisCollection = db.collection('endpoints');
     const usersCollection = db.collection('users');
     
-    // Check if API exists
-    const api = await apisCollection.findOne({ _id: new ObjectId(apiId) });
-    if (!api) {
-      return NextResponse.json(
-        { success: false, message: 'API not found' },
-        { status: 404 }
-      );
-    }
+    
     
     // Get user ID from session
     const user = await usersCollection.findOne({ email: session.user.email });
@@ -94,9 +73,8 @@ export async function POST(request: NextRequest) {
       // Create new key document
       const newKey = {
         _id: new ObjectId(),
-        name: `${api.name} Key ${i + 1}`,
+        name: `Key ${i + 1}`,
         key,
-        apiId: new ObjectId(apiId),
         userId: user._id,
         isActive: true,
         createdAt: now,

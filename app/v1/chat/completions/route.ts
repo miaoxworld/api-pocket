@@ -31,7 +31,9 @@ export async function POST(request: NextRequest) {
     const requestBody = await requestClone.json();
     
     // Find an API that supports the requested model, or use the first active API if no model specified
-    let targetApi = validation.endpoints[0]; // Default to first API
+    //randome target api
+    const randomIndex = Math.floor(Math.random() * validation.endpoints.length);
+    let targetApi = validation.endpoints[randomIndex];
     
     if (requestBody.model) {
       // Find API that supports the requested model

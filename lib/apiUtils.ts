@@ -16,7 +16,6 @@ export interface ApiKey {
   id: string;
   name: string;
   key: string;
-  apiId?: string;
   userId: string;
   isActive: boolean;
   createdAt: Date;

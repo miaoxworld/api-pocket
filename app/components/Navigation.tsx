@@ -6,17 +6,25 @@ import { useSession, signOut } from 'next-auth/react';
 import { useState } from 'react';
 import { FiGithub } from 'react-icons/fi';
 import { RiDiscordFill } from 'react-icons/ri';
+import { useTranslations } from 'next-intl';
+import LanguageSwitcher from './LanguageSwitcher';
 
 export default function Navigation() {
   const pathname = usePathname();
   const { data: session, status } = useSession();
   const [showUserMenu, setShowUserMenu] = useState(false);
-
+  const t = useTranslations('app');
+  const loginT = useTranslations('login');
+  
+  // Extract locale from pathname
+  const pathSegments = pathname.split('/');
+  const locale = pathSegments.length > 1 ? pathSegments[1] : 'en';
+  
   const navItems = [
-    { name: 'Dashboard', href: '/' },
-    { name: 'Endpoint Manager', href: '/endpoint-manager' },
-    { name: 'API Keys', href: '/api-keys' },
-    { name: '使用量统计', href: '/usage-dashboard' },
+    { name: t('nav.dashboard'), href: `/${locale}` },
+    { name: t('nav.endpoints'), href: `/${locale}/endpoint-manager` },
+    { name: t('nav.keys'), href: `/${locale}/api-keys` },
+    { name: t('nav.apiusage'), href: `/${locale}/usage-dashboard` },
   ];
 
   const toggleUserMenu = () => {
@@ -25,17 +33,20 @@ export default function Navigation() {
 
   // Handle sign out
   const handleSignOut = async () => {
-    await signOut({ redirect: true, callbackUrl: '/login' });
+    await signOut({ redirect: true, callbackUrl: `/${locale}/login` });
   };
 
   return (
     <nav className="bg-white border-b border-gray-200 dark:bg-gray-900 dark:border-gray-700">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-        <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-          <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">API Pocket</span>
+        <Link href={`/${locale}`} className="flex items-center space-x-3 rtl:space-x-reverse">
+          <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">{t('title')}</span>
         </Link>
         <div className="flex items-center md:order-2">
           <div className="hidden md:flex items-center mr-6 space-x-5">
+            <div className="mr-2">
+              <LanguageSwitcher />
+            </div>
             <Link 
               href="https://github.com/miaoxworld/api-pocket-nextjs" 
               target="_blank"
@@ -79,13 +90,13 @@ export default function Navigation() {
                   </div>
                   <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
                     <li>
-                      <Link href="/profile" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                        Profile
+                      <Link href={`/${locale}/profile`} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                        {t('nav.profile')}
                       </Link>
                     </li>
                     <li>
-                      <Link href="/settings" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                        Settings
+                      <Link href={`/${locale}/settings`} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                        {t('nav.settings')}
                       </Link>
                     </li>
                   </ul>
@@ -94,7 +105,7 @@ export default function Navigation() {
                       onClick={handleSignOut}
                       className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
                     >
-                      Sign out
+                      {t('nav.signOut')}
                     </button>
                   </div>
                 </div>
@@ -102,11 +113,11 @@ export default function Navigation() {
             </div>
           ) : (
             <div className="flex space-x-2">
-              <Link href="/login" className="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-                Sign In
+              <Link href={`/${locale}/login`} className="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                {loginT('signIn')}
               </Link>
-              <Link href="/register" className="text-gray-800 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white focus:outline-none dark:focus:ring-gray-700">
-                Register
+              <Link href={`/${locale}/register`} className="text-gray-800 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white focus:outline-none dark:focus:ring-gray-700">
+                {loginT('registerHere')}
               </Link>
             </div>
           )}
@@ -146,6 +157,11 @@ export default function Navigation() {
               >
                 <RiDiscordFill size={22} />
               </Link>
+            </li>
+            <li className="md:hidden mt-4">
+              <div className="flex justify-center">
+                <LanguageSwitcher />
+              </div>
             </li>
           </ul>
         </div>

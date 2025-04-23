@@ -3,10 +3,14 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Navigation from '../components/Navigation';
+import { useTranslations } from 'next-intl';
+import Navigation from '../../components/Navigation';
 
 export default function Register() {
   const router = useRouter();
+  const t = useTranslations('register');
+  const appT = useTranslations('app');
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -23,17 +27,17 @@ export default function Register() {
 
   const validateForm = () => {
     if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
-      setError('All fields are required');
+      setError(t('errors.allRequired'));
       return false;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('errors.passwordsNotMatch'));
       return false;
     }
 
     if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters long');
+      setError(t('errors.passwordTooShort'));
       return false;
     }
 
@@ -64,13 +68,13 @@ export default function Register() {
       const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.message || 'Registration failed');
+        throw new Error(data.message || t('errors.registrationFailed'));
       }
       
       // Redirect to login page after successful registration
       router.push('/login?registered=true');
     } catch (err: any) {
-      setError(err.message || 'An error occurred during registration');
+      setError(err.message || t('errors.registrationFailed'));
     } finally {
       setLoading(false);
     }
@@ -82,7 +86,7 @@ export default function Register() {
       <main className="flex-grow flex items-center justify-center p-6">
         <div className="w-full max-w-md">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
-            <h1 className="text-2xl font-bold mb-6 text-center">Create an Account</h1>
+            <h1 className="text-2xl font-bold mb-6 text-center">{t('title')}</h1>
             
             {error && (
               <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
@@ -93,7 +97,7 @@ export default function Register() {
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Full Name
+                  {t('fullName')}
                 </label>
                 <input
                   type="text"
@@ -102,13 +106,13 @@ export default function Register() {
                   value={formData.name}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  placeholder="Enter your full name"
+                  placeholder={t('placeholders.fullName')}
                 />
               </div>
               
               <div className="mb-4">
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Email Address
+                  {t('email')}
                 </label>
                 <input
                   type="email"
@@ -117,13 +121,13 @@ export default function Register() {
                   value={formData.email}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  placeholder="Enter your email"
+                  placeholder={t('placeholders.email')}
                 />
               </div>
               
               <div className="mb-4">
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Password
+                  {t('password')}
                 </label>
                 <input
                   type="password"
@@ -132,13 +136,13 @@ export default function Register() {
                   value={formData.password}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  placeholder="Create a password"
+                  placeholder={t('placeholders.password')}
                 />
               </div>
               
               <div className="mb-6">
                 <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Confirm Password
+                  {t('confirmPassword')}
                 </label>
                 <input
                   type="password"
@@ -147,7 +151,7 @@ export default function Register() {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  placeholder="Confirm your password"
+                  placeholder={t('placeholders.confirmPassword')}
                 />
               </div>
               
@@ -156,15 +160,15 @@ export default function Register() {
                 disabled={loading}
                 className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Creating account...' : 'Register'}
+                {loading ? t('creating') : t('registerButton')}
               </button>
             </form>
             
             <div className="mt-6 text-center text-sm">
               <p className="text-gray-600 dark:text-gray-400">
-                Already have an account?{' '}
+                {t('alreadyHaveAccount')}{' '}
                 <Link href="/login" className="text-blue-500 hover:text-blue-600">
-                  Sign in
+                  {t('signIn')}
                 </Link>
               </p>
             </div>

@@ -4,6 +4,7 @@ import { FormEvent, useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -13,12 +14,13 @@ export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const registered = searchParams.get('registered');
+  const t = useTranslations('login');
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     
     if (!email || !password) {
-      setError('Email and password are required');
+      setError(t('emailRequired'));
       return;
     }
     
@@ -33,7 +35,7 @@ export default function LoginForm() {
       });
       
       if (result?.error) {
-        setError('Invalid email or password');
+        setError(t('invalidCredentials'));
         setIsLoading(false);
         return;
       }
@@ -43,14 +45,14 @@ export default function LoginForm() {
         const sessionResponse = await fetch('/api/auth/session');
         
         if (sessionResponse.status === 401) {
-          setError('User not found in database. Please register first.');
+          setError(t('userNotFound'));
           setIsLoading(false);
           return;
         }
         
         if (!sessionResponse.ok) {
           console.error('Error checking session:', sessionResponse.statusText);
-          setError('An error occurred during login');
+          setError(t('loginError'));
           setIsLoading(false);
           return;
         }
@@ -60,12 +62,12 @@ export default function LoginForm() {
         router.refresh();
       } catch (sessionError) {
         console.error('Session check error:', sessionError);
-        setError('An error occurred while verifying your account');
+        setError(t('sessionError'));
         setIsLoading(false);
       }
     } catch (error) {
       console.error('Login error:', error);
-      setError('An unexpected error occurred');
+      setError(t('unexpectedError'));
       setIsLoading(false);
     }
   };
@@ -75,14 +77,14 @@ export default function LoginForm() {
     setError('');
     
     try {
-      // 不再使用复杂的错误处理流程，直接调用
+      // 使用简化的错误处理流程
       await signIn('google', { 
         callbackUrl: window.location.origin 
       });
       // 重定向将由 NextAuth 自动处理
     } catch (error) {
-      console.error('Google 登录错误:', error);
-      setError('登录过程中发生错误');
+      console.error('Google login error:', error);
+      setError(t('googleError'));
       setIsLoading(false);
     }
   };
@@ -91,7 +93,7 @@ export default function LoginForm() {
     <>
       {registered && (
         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded dark:bg-green-900/50 dark:text-green-100 dark:border-green-800">
-          Registration successful! Please sign in.
+          {t('registrationSuccess')}
         </div>
       )}
       
@@ -115,20 +117,20 @@ export default function LoginForm() {
               <path fill="#EA4335" d="M -14.754 43.989 C -12.984 43.989 -11.404 44.599 -10.154 45.789 L -6.734 42.369 C -8.804 40.429 -11.514 39.239 -14.754 39.239 C -19.444 39.239 -23.494 41.939 -25.464 45.859 L -21.484 48.949 C -20.534 46.099 -17.884 43.989 -14.754 43.989 Z" />
             </g>
           </svg>
-          Sign in with Google
+          {t('signInWithGoogle')}
         </button>
       </div>
       
       <div className="mt-6 flex items-center">
         <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
-        <div className="px-3 text-xs text-gray-500 dark:text-gray-400">OR</div>
+        <div className="px-3 text-xs text-gray-500 dark:text-gray-400">{t('or')}</div>
         <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
       </div>
       
       <form className="mt-6 space-y-6" onSubmit={handleSubmit}>
         <div className="rounded-md shadow-sm -space-y-px">
           <div>
-            <label htmlFor="email" className="sr-only">Email address</label>
+            <label htmlFor="email" className="sr-only">{t('email')}</label>
             <input
               id="email"
               name="email"
@@ -136,14 +138,14 @@ export default function LoginForm() {
               autoComplete="email"
               required
               className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              placeholder="Email address"
+              placeholder={t('email')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={isLoading}
             />
           </div>
           <div>
-            <label htmlFor="password" className="sr-only">Password</label>
+            <label htmlFor="password" className="sr-only">{t('password')}</label>
             <input
               id="password"
               name="password"
@@ -151,7 +153,7 @@ export default function LoginForm() {
               autoComplete="current-password"
               required
               className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              placeholder="Password"
+              placeholder={t('password')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={isLoading}
@@ -165,15 +167,15 @@ export default function LoginForm() {
             className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isLoading}
           >
-            {isLoading ? 'Signing in...' : 'Sign in with Email'}
+            {isLoading ? t('signingIn') : t('signInWithEmail')}
           </button>
         </div>
         
         <div className="text-center text-sm">
           <p className="text-gray-600 dark:text-gray-400">
-            Don&apos;t have an account yet?{' '}
+            {t('noAccount')}{' '}
             <Link href="/register" className="text-blue-500 hover:text-blue-600">
-              Register here
+              {t('registerHere')}
             </Link>
           </p>
         </div>
